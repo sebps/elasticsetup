@@ -220,13 +220,13 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
             "analyzer": "lowercase_asciifolding_analyzer"
           }
         }
-      }
+      },
       "excerpt": {
         "type": "text",
         "fields": {
           "keyword": {
             "type": "keyword"
-          },
+          }
         }
       }
     }
