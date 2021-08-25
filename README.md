@@ -1,30 +1,36 @@
 # Elastic Setup
 Lightweight library to quickly setup an Elasticsearch index from settings, analyzer, normalizer, tokenizer and mapping. Optionally reindex data from the same or another index of the same cluster.
 
-## Usage
+<!--TOC-->
+* [Usage](#usage)
+  * [CLI](#CLI)
+  * [LIB](#LIB)
+* [Note](#Note)  
+* [License](#license)
+<!--TOC-->
 
-### CLI
+# Usage
 
-#### Install CLI
+## CLI
+
+### Install CLI
 ```npm install -g elasticsetup```
 
-#### Setup without reindexing
+### Setup without reindexing
 ```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json```
 
-#### Setup with data reindexing from distinct index
+### Setup with data reindexing from distinct index
 ```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json -o products_old```
 
-#### Setup with data reindexing from same index
+### Setup with data reindexing from same index
 ```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json -o products```
 
-#### Setup using credentials
+### Setup using credentials
 ```elasticsetup -h 192.168.0.10-i products -c credentials.json -a analyzer.json mapping.json```
 
+### File format and examples 
 
-#### File format and examples 
-
-
-##### Credentials example
+#### Credentials example
 ```json
 {
   "username": "user",
@@ -32,14 +38,14 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 }
 ```
 
-##### Settings example
+#### Settings example
 ```json
 {
   "max_ngram_diff": 10
 }
 ```
 
-##### Analyzer example
+#### Analyzer example
 ```json
 {
   "lowercase_analyzer": {
@@ -60,7 +66,7 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 }
 ```
 
-##### Normalizer example
+#### Normalizer example
 ```json
   {
     "lowercase_asciifolding_normalizer": {
@@ -71,7 +77,7 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
   }
 ```
 
-##### Tokenizer example
+#### Tokenizer example
 ```json
 {
   "edge_ngram": {
@@ -94,7 +100,7 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 }
 ```
 
-##### Mapping example
+#### Mapping example
 ```json
 {
   "properties": {
@@ -131,8 +137,7 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 } 
 ```
 
-
-### Lib
+## LIB
 
 ```npm install --save elasticsetup```
 
@@ -244,14 +249,20 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
   })()
 ```
 
-## Basic Authorization
-In order for the basic authorization to be properly handled by the lib http calls to the Elasticsearch cluster, the environment variable ELASTICSEARCH_AUTHORIZATION_TOKEN must be set to the base64 encoded value of "username:password" string.
+# Notes
 
+## Basic Authorization 
+In order for the basic authorization to be properly handled by the lib http calls to the Elasticsearch cluster, the environment variable ELASTICSEARCH_AUTHORIZATION_TOKEN must be set to the base64 encoded value of "username:password" string. 
+- In CLI usage, the path to a valid credentials.json ( { username: <username>, password: <password> } ) must be provided as a -c argument.
+- In LIB usage, the variable must be set either coming from an loaded env file or at runtime.
+  
 ## Reindexing data
 In case of data reindexing ( ie the name of the index containing the origin data passed as the last parameter to the setup method ) the following situation might occur :
 
-### Distinct origin index
+- Distinct origin index
 The index to setup will be deleted ( if already existing ) and created with the settings and mapping provided. At the end of the process, the data stored in the origin index will be indexed into the newly created index
 
-### Same origin index 
+- Same origin index 
 A new temporary index will be firstly created and the original data will then be indexed into that temporary index. The original index will then be deleted and recreated with the settings and mapping provided. At the end of the process, the data stored into the temporary index will be indexed back into the newly created index and the temporary index will be ultimately deleted.
+
+# LICENSE
