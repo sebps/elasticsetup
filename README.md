@@ -1,4 +1,4 @@
-# elasticsetup
+# Elasticsetup
 Lightweight library to quickly setup an Elasticsearch index from settings, analyzer, normalizer, tokenizer and mapping. Optionally reindex data from the same or another index of the same cluster.
 
 <!--TOC-->
@@ -265,7 +265,7 @@ The index to setup will be deleted ( if already existing ) and created with the 
 - Same origin index 
 A new temporary index will be firstly created and the original data will then be indexed into that temporary index. The original index will then be deleted and recreated with the settings and mapping provided. At the end of the process, the data stored into the temporary index will be indexed back into the newly created index and the temporary index will be ultimately deleted.
 
-# LICENSE
+# License
 
 ISC
 
