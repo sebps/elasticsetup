@@ -16,19 +16,29 @@ let { host, index, analyzer, mapping, origin, settings } = yargs
  .option("o", { alias: "origin", describe: "Origin index name", type: "string", demandOption: false })
  .argv;
 
-const analyzerRawdata = readFileSync(analyzer.trim());
-analyzer = JSON.parse(analyzerRawdata);
+ if(analyzer) {
+   const analyzerRawdata = readFileSync(analyzer.trim());
+   analyzer = JSON.parse(analyzerRawdata);
+ }
 
-const settingsRawdata = readFileSync(settings.trim());
-settings = JSON.parse(settingsRawdata);
+ if(settings) {
+   const settingsRawdata = readFileSync(settings.trim());
+   settings = JSON.parse(settingsRawdata);
+ }
 
-const normalizerRawdata = readFileSync(normalizer.trim());
-normalizer = JSON.parse(normalizerRawdata);
+ if(normalizer) {
+   const normalizerRawdata = readFileSync(normalizer.trim());
+   normalizer = JSON.parse(normalizerRawdata);
+ }
 
-const tokenizerRawdata = readFileSync(tokenizer.trim());
-tokenizer = JSON.parse(tokenizerRawdata);
+ if(tokenizer) {
+   const tokenizerRawdata = readFileSync(tokenizer.trim());
+   tokenizer = JSON.parse(tokenizerRawdata);
+ }
 
-const mappingRawdata = readFileSync(mapping.trim());
-mapping = JSON.parse(mappingRawdata);
+ if(mapping) {
+  const mappingRawdata = readFileSync(mapping.trim());
+  mapping = JSON.parse(mappingRawdata);
+ }
 
 core.setup(host, index, settings, analyzer, normalizer, tokenizer, mapping, origin)
