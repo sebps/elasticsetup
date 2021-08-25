@@ -8,7 +8,7 @@ const countIndex = async (host, index) => {
   let json = await response.json()
 
   if (!response.ok) {
-    throw new Error(json.error.reason)
+    throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
   } else {
     return json
   }
@@ -22,7 +22,7 @@ const getTask = async (host, id) => {
   let json = await response.json()
 
   if (!response.ok) {
-    throw new Error(json.error.reason)
+    throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
   } else {
     return json
   }
@@ -42,7 +42,7 @@ const reIndex = async (host, sourceIndex, targetIndex) => {
   let json = await response.json()
 
   if (!response.ok) {
-    throw new Error(json.error.reason)
+    throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
   } else {
     return json
   }
@@ -60,7 +60,7 @@ const deleteIndex = async (host, index) => {
 
   if (!response.ok) {
     // handle alias case : if index passed in parameter is an alias, delete all of the associated indexes
-    if (json.error.reason.indexOf('matches an alias') !== -1) {
+    if (json.error && json.error.reason && json.error.reason.indexOf('matches an alias') !== -1) {
         response = await fetch(`${host}/_alias/${index}`, {
           method: 'get',
           headers: {
@@ -71,7 +71,7 @@ const deleteIndex = async (host, index) => {
         json = await response.json()
 
         if (!response.ok) {
-          throw new Error(json.error.reason)
+          throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
         } else {
           return Promise.all(Object.keys(json).map((aliasIndex) => {
             return deleteIndex(host, aliasIndex)
@@ -103,7 +103,7 @@ const createIndex = async (host, index) => {
   let json = await response.json()
 
   if (!response.ok) {
-    throw new Error(json.error.reason)
+    throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
   } else {
     return json
   }
@@ -120,7 +120,7 @@ const closeIndex = async (host, index) => {
   let json = await response.json()
 
   if (!response.ok) {
-    throw new Error(json.error.reason)
+    throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
   } else {
     return json
   }
@@ -137,7 +137,7 @@ const openIndex = async (host, index) => {
   let json = await response.json()
 
   if (!response.ok) {
-    throw new Error(json.error.reason)
+    throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
   } else {
     return json
   }
@@ -157,7 +157,7 @@ const updateSettings = async (host, index, settings = {}, analyzer, normalizer, 
   let json = await response.json()
 
   if (!response.ok) {
-    throw new Error(json.error.reason)
+    throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
   } else {
     return json
   }
@@ -177,7 +177,7 @@ const updateMapping = async (host, index, properties) => {
   let json = await response.json()
 
   if (!response.ok) {
-    throw new Error(json.error.reason)
+    throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
   } else {
     return json
   }
