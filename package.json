@@ -1,12 +1,16 @@
 {
   "name": "elasticsetup",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sebps/elasticsetup.git"
+  },
+  "author": "sebps",
   "license": "ISC",
   "bin": {
     "elasticsetup": "./bin/cli.js"
@@ -15,5 +19,9 @@
     "cli-progress": "^3.9.0",
     "node-fetch": "^2.6.1",
     "yargs": "^17.0.1"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/sebps/elasticsetup/issues"
+  },
+  "homepage": "https://github.com/sebps/elasticsetup#readme"
 }
