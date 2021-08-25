@@ -5,15 +5,15 @@ const core = require("./core")
 const { readFileSync } = require("fs")
 
 let { host, index, analyzer, mapping, origin, settings } = yargs
- .usage("Usage: -h <host> -n <index_name> -a <analyzer_json_path> -m <mapping_json_path>")
+ .usage("Usage: elasticsetup -h <host> -i <index_name> -s <settings_json_path> -a <analyzer_json_path> -n <normalizer_json_path> -t <tokenizer_json_path> -m <mapping_json_path> -o <origin_index_name>")
  .option("h", { alias: "host", describe: "Host", type: "string", demandOption: true }) 
  .option("i", { alias: "index", describe: "Index name", type: "string", demandOption: true })
- .option("a", { alias: "analyzer", describe: "Index analyzer", type: "string", demandOption: true })
  .option("s", { alias: "settings", describe: "Index settings", type: "string", demandOption: false })
+ .option("a", { alias: "analyzer", describe: "Index analyzer", type: "string", demandOption: true })
  .option("n", { alias: "normalizer", describe: "Index normalizer", type: "string", demandOption: true })
- .option("o", { alias: "origin", describe: "Origin index name", type: "string", demandOption: false })
  .option("t", { alias: "tokenizer", describe: "Index tokenizer", type: "string", demandOption: true })
  .option("m", { alias: "mapping", describe: "Index mapping", type: "string", demandOption: true })
+ .option("o", { alias: "origin", describe: "Origin index name", type: "string", demandOption: false })
  .argv;
 
 const analyzerRawdata = readFileSync(analyzer.trim());
