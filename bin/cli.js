@@ -9,10 +9,10 @@ let { host, index, analyzer, mapping, origin, settings } = yargs
  .option("h", { alias: "host", describe: "Host", type: "string", demandOption: true }) 
  .option("i", { alias: "index", describe: "Index name", type: "string", demandOption: true })
  .option("s", { alias: "settings", describe: "Index settings", type: "string", demandOption: false })
- .option("a", { alias: "analyzer", describe: "Index analyzer", type: "string", demandOption: true })
- .option("n", { alias: "normalizer", describe: "Index normalizer", type: "string", demandOption: true })
- .option("t", { alias: "tokenizer", describe: "Index tokenizer", type: "string", demandOption: true })
- .option("m", { alias: "mapping", describe: "Index mapping", type: "string", demandOption: true })
+ .option("a", { alias: "analyzer", describe: "Index analyzer", type: "string", demandOption: false })
+ .option("n", { alias: "normalizer", describe: "Index normalizer", type: "string", demandOption: false })
+ .option("t", { alias: "tokenizer", describe: "Index tokenizer", type: "string", demandOption: false })
+ .option("m", { alias: "mapping", describe: "Index mapping", type: "string", demandOption: false })
  .option("o", { alias: "origin", describe: "Origin index name", type: "string", demandOption: false })
  .argv;
 
