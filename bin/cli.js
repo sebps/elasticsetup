@@ -4,7 +4,7 @@ const yargs = require("yargs")
 const core = require("./core")
 const { readFileSync } = require("fs")
 
-let { host, index, analyzer, mapping, origin, settings } = yargs
+let { host, index, settings, analyzer, normalizer, tokenizer, mapping, origin } = yargs
  .usage("Usage: elasticsetup -h <host> -i <index_name> -s <settings_json_path> -a <analyzer_json_path> -n <normalizer_json_path> -t <tokenizer_json_path> -m <mapping_json_path> -o <origin_index_name>")
  .option("h", { alias: "host", describe: "Host", type: "string", demandOption: true }) 
  .option("i", { alias: "index", describe: "Index name", type: "string", demandOption: true })
