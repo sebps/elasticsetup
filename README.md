@@ -9,13 +9,13 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 ```npm install -g elasticsetup```
 
 #### Setup without reindexing
-```elasticsetup -h 192.168.0.10 -i products -a analyzer.json -m mapping.json```
+```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json```
 
 #### Setup with data reindexing from distinct index
-```elasticsetup -h 192.168.0.10 -i products -a analyzer.json -m mapping.json -s products_old```
+```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json -o products_old```
 
 #### Setup with data reindexing from same index
-```elasticsetup -h 192.168.0.10 -i products -a analyzer.json -m mapping.json -s products```
+```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json -o products```
 
 #### File format and examples 
 
@@ -200,10 +200,10 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 ```
 
 ## Reindexing data
-In case of data reindexing ( ie the name of the index containing the source data passed as the last parameter to the setup method ) the following situation might occur :
+In case of data reindexing ( ie the name of the index containing the origin data passed as the last parameter to the setup method ) the following situation might occur :
 
-### Distinct source index
-The index to setup will be deleted ( if already existing ) and created with the settings and mapping provided. At the end of the process, the data stored in the source index will be indexed into the newly created index
+### Distinct origin index
+The index to setup will be deleted ( if already existing ) and created with the settings and mapping provided. At the end of the process, the data stored in the origin index will be indexed into the newly created index
 
-### Same source index 
+### Same origin index 
 A new temporary index will be firstly created and the original data will then be indexed into that temporary index. The original index will then be deleted and recreated with the settings and mapping provided. At the end of the process, the data stored into the temporary index will be indexed back into the newly created index and the temporary index will be ultimately deleted.
