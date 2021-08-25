@@ -3,6 +3,7 @@ const fetch = require('node-fetch')
 const countIndex = async (host, index) => {
   let response = await fetch(`${host}/${index}/_count`, {
     method: 'get',
+    headers: { 'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined }    
   })
     
   let json = await response.json()
@@ -17,6 +18,7 @@ const countIndex = async (host, index) => {
 const getTask = async (host, id) => {
   let response = await fetch(`${host}/_tasks/${id}`, {
     method: 'get',
+    headers: { 'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined }   
   })
     
   let json = await response.json()
@@ -35,7 +37,8 @@ const reIndex = async (host, sourceIndex, targetIndex) => {
     method: 'post',
     body,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined  
     }
   })
   
@@ -52,7 +55,8 @@ const deleteIndex = async (host, index) => {
   let response = await fetch(`${host}/${index}`, {
     method: 'delete',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined    
     }
   })
 
@@ -64,7 +68,8 @@ const deleteIndex = async (host, index) => {
         response = await fetch(`${host}/_alias/${index}`, {
           method: 'get',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined
           }
         })
 
@@ -89,6 +94,7 @@ const deleteIndex = async (host, index) => {
 const existsIndex = async (host, index) => {
   return await fetch(`${host}/${index}`, {
     method: 'head',
+    headers: { 'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined }  
   }).then(res => res.status == 200 ? true : false)
 }
 
@@ -96,7 +102,8 @@ const createIndex = async (host, index) => {
   let response = await fetch(`${host}/${index}`, {
     method: 'put',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined
     }
   })
 
@@ -113,7 +120,8 @@ const closeIndex = async (host, index) => {
   let response = await fetch(`${host}/${index}/_close`, {
     method: 'post',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined
     }
   })
 
@@ -130,7 +138,8 @@ const openIndex = async (host, index) => {
   let response = await fetch(`${host}/${index}/_open`, {
     method: 'post',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined
     }
   })
 
@@ -150,7 +159,8 @@ const updateSettings = async (host, index, settings = {}, analyzer, normalizer, 
     method: 'put',
     body,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined
     }
   })
   
@@ -163,14 +173,15 @@ const updateSettings = async (host, index, settings = {}, analyzer, normalizer, 
   }
 }
 
-const updateMapping = async (host, index, properties) => {
-  const body = JSON.stringify({ properties, _source: { enabled : true }})
+const updateMapping = async (host, index, mapping) => {
+  const body = JSON.stringify(mapping)
 
   let response = await fetch(`${host}/${index}/_mapping`, {
     method: 'put',
     body,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined
     }
   })
   

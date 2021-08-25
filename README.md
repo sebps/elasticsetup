@@ -17,7 +17,20 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 #### Setup with data reindexing from same index
 ```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json -o products```
 
+#### Setup using credentials
+```elasticsetup -h 192.168.0.10-i products -c credentials.json -a analyzer.json mapping.json```
+
+
 #### File format and examples 
+
+
+##### Credentials example
+```json
+{
+  "username": "user",
+  "password": "password"
+}
+```
 
 ##### Settings example
 ```json
@@ -84,23 +97,36 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 ##### Mapping example
 ```json
 {
-  "title": {
-    "type": "keyword"
-  },
-  "description": {
-    "type": "text",
-    "analyzer": "lowercase_asciifolding_analyzer"
-  },
-  "price": {
-    "type": "float"
-  },
-  "excerpt": {
-    "type": "text",
-    "fields": {
-      "keyword": {
-        "type": "keyword"
+  "properties": {
+    "title": {
+      "type": "keyword"
+    },
+    "description": {
+      "type": "text",
+      "analyzer": "lowercase_asciifolding_analyzer"
+    },
+    "price": {
+      "type": "float"
+    },
+    "category": {
+      "properties": {
+        "title": {
+          "type": "keyword"
+        },
+        "description": {
+          "type": "text",
+          "analyzer": "lowercase_asciifolding_analyzer"
+        }
       }
-    }
+    },
+    "excerpt": {
+      "type": "text",
+      "fields": {
+        "keyword": {
+          "type": "keyword"
+        }
+      }
+    } 
   }
 } 
 ```
@@ -115,6 +141,12 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
   const host = ' 192.168.0.10'
   const index = 'products' 
   const otherIndex = 'oldProducts'
+
+  // if authorization required
+  const username = "user"
+  const password = "password"
+  process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN = Buffer.from(`${username}:${password}`).toString('base64');
+ }
 
   const settings = {
     "max_ngram_diff": 10
@@ -167,22 +199,35 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
   }
 
   const mapping = {
-    "title": {
-      "type": "keyword",
-    },
-    "description": {
-      "type": "text",
-      "analyzer": "lowercase_asciifolding_analyzer"
-    },
-    "price": {
-      "type": "float"
-    },
-    "excerpt": {
-      "type": "text",
-      "fields": {
-        "keyword": {
-          "type": "keyword"
-        },
+    "properties": {
+      "title": {
+        "type": "keyword",
+      },
+      "description": {
+        "type": "text",
+        "analyzer": "lowercase_asciifolding_analyzer"
+      },
+      "price": {
+        "type": "float"
+      },
+      "category": {
+        "properties": {
+          "title": {
+            "type": "keyword"
+          },
+          "description": {
+            "type": "text",
+            "analyzer": "lowercase_asciifolding_analyzer"
+          }
+        }
+      }
+      "excerpt": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          },
+        }
       }
     }
   }
@@ -198,6 +243,9 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
     await setup(host, index, settings, analyzer, normalizer, tokenizer, mapping, index)
   })()
 ```
+
+## Basic Authorization
+In order for the basic authorization to be properly handled by the lib http calls to the Elasticsearch cluster, the environment variable ELASTICSEARCH_AUTHORIZATION_TOKEN must be set to the base64 encoded value of "username:password" string.
 
 ## Reindexing data
 In case of data reindexing ( ie the name of the index containing the origin data passed as the last parameter to the setup method ) the following situation might occur :
