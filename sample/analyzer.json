@@ -1,0 +1,17 @@
+{
+  "lowercase_analyzer": {
+    "type": "custom", 
+    "tokenizer": "standard",
+    "filter": [
+      "lowercase"
+    ]
+  },
+  "lowercase_asciifolding_analyzer": {
+    "type": "custom", 
+    "tokenizer": "standard",
+    "filter": [
+      "lowercase",
+      "asciifolding"
+    ]
+  }  
+}

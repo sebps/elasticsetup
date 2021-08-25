@@ -1,0 +1,20 @@
+{
+  "title": {
+    "type": "keyword"
+  },
+  "description": {
+    "type": "text",
+    "analyzer": "lowercase_asciifolding_analyzer"
+  },
+  "price": {
+    "type": "float"
+  },
+  "excerpt": {
+    "type": "text",
+    "fields": {
+      "keyword": {
+        "type": "keyword"
+      }
+    }
+  }
+} 
