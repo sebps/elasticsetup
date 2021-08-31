@@ -17,16 +17,16 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 ```npm install -g elasticsetup```
 
 ### Setup without reindexing
-```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json```
+```elasticsetup -h 192.168.0.10 -i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json```
 
 ### Setup with data reindexing from distinct index
-```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json -o products_old```
+```elasticsetup -h 192.168.0.10 -i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json -o products_old```
 
 ### Setup with data reindexing from same index
-```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json -o products```
+```elasticsetup -h 192.168.0.10 -i products -s settings.json -a analyzer.json -n normalizer.json -t tokenizer.json -m mapping.json -o products```
 
 ### Setup using credentials
-```elasticsetup -h 192.168.0.10-i products -c credentials.json -a analyzer.json mapping.json```
+```elasticsetup -h 192.168.0.10 -i products -c credentials.json -a analyzer.json mapping.json```
 
 ### File format and examples 
 
