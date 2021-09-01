@@ -159,7 +159,7 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
   const index = 'products' 
   const otherIndex = 'oldProducts'
   const dataDirPath = './data'
-  const dataDirPath = './data/products.json'
+  const dataFilePath = './data/products.json'
 
   // if authorization required
   const username = "user"
@@ -268,7 +268,7 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
     await setup(host, index, settings, analyzer, normalizer, tokenizer, mapping, null, dataDirPath)
 
     // setup index with data reindexing from distinct index and local data path
-    await setup(host, index, settings, analyzer, normalizer, tokenizer, mapping, otherIndex, data)
+    await setup(host, index, settings, analyzer, normalizer, tokenizer, mapping, otherIndex, dataFilePath)
   })()
 ```
 
