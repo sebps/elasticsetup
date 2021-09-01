@@ -21,7 +21,7 @@ const { waitFor, getAllFiles } = require('./utils')
 
 const colors = ['\x1b[31m','\x1b[32m','\x1b[33m','\x1b[34m','\x1b[35m','\x1b[36m','\x1b[37m']
 
-const BATCH_SIZE = 100
+const BATCH_SIZE = 1000
 const FILE_SIZE_UNIT = "KB" 
 
 // const LOCK_DIR = join('/tmp','elasticsetup','locks')
@@ -306,9 +306,6 @@ module.exports = {
               size: accumulator.size + current.size
             } 
           }, { paths: [], size: 0 }) 
-
-          console.log("size found is : ")
-          console.log(size)
 
           filePaths = paths
           totalSize = FILE_SIZE_UNIT === "MB" ? Math.floor(size/1000000) : FILE_SIZE_UNIT === "KB" ? Math.floor(size/1000) : size
