@@ -1,11 +1,28 @@
-
-const cliProgress = require('cli-progress')
-const { reIndex, createIndex, countIndex, deleteIndex, updateMapping, updateSettings, openIndex, closeIndex, existsIndex, getTask } = require('./elasticsearch')
-// const { writeFileSync, mkdirSync, unlinkSync } = require('fs')
-const { waitFor } = require('./utils')
+const { statSync, createReadStream } = require('fs')
+const { createInterface } = require('readline')
 const { join } = require('path')
+const cliProgress = require('cli-progress')
+
+const { 
+  closeIndex, 
+  countIndex, 
+  createIndex, 
+  deleteIndex, 
+  existsIndex, 
+  getTask,
+  indexDocuments,
+  openIndex, 
+  reIndex, 
+  updateMapping, 
+  updateSettings
+} = require('./elasticsearch')
+
+const { waitFor, getAllFiles } = require('./utils')
 
 const colors = ['\x1b[31m','\x1b[32m','\x1b[33m','\x1b[34m','\x1b[35m','\x1b[36m','\x1b[37m']
+
+const BATCH_SIZE = 100
+const FILE_SIZE_UNIT = "KB" 
 
 // const LOCK_DIR = join('/tmp','elasticsetup','locks')
 
@@ -19,7 +36,7 @@ const colors = ['\x1b[31m','\x1b[32m','\x1b[33m','\x1b[34m','\x1b[35m','\x1b[36m
 // }
 
 module.exports = {
-  setup: async (host, index, settings, analyzer, normalizer, tokenizer, mapping, source = null) => {
+  setup: async (host, index, settings, analyzer, normalizer, tokenizer, mapping, source = null, data = null) => {
     if(!host) {
       throw new Error('host mandatory')
     }
@@ -210,7 +227,7 @@ module.exports = {
       throw new Error(join(host,index) + ' : ' + err)
     }
 
-    if(source) {
+    if (source) {
       let src = source != index ? source : random
 
       try {
@@ -228,7 +245,7 @@ module.exports = {
         response = await reIndex(host, src, index)
         console.log(color,join(host,index) + ' : ' + JSON.stringify(response)+'\n')
 
-        if(response && response.task) {
+        if (response && response.task) {
           // fetch task until its status is completed
           try {
             task = await getTask(host, response.task)
@@ -260,18 +277,9 @@ module.exports = {
         console.error(join(host,index) + ' : ' + err)
         throw new Error(join(host,index) + ' : ' + err)
       }
-      // try {
-      //   console.log(color,`${join(host,index)} : reindex data in new index ${index} \n`)
-      //   response = await reIndex(host, src, index)
-      //   console.log(color,join(host,index) + ' : ' + JSON.stringify(response)+'\n')
-      // } catch (err) {
-      //   console.log(color,`${join(host,index)} : error reindexing data in new index \n`)
-      //   console.error(join(host,index) + ' : ' + err)
-      //   throw new Error(join(host,index) + ' : ' + err)
-      // }
     }
 
-    if(source && source == index) {
+    if (source && source == index) {
       try {
         console.log(color,`${join(host,index)} : delete tmp index ${random} \n`)
         response = await deleteIndex(host, random)
@@ -280,6 +288,84 @@ module.exports = {
         console.log(color,`${join(host,index)} : error deleting tmp index \n`)
         console.error(err)
         throw new Error(err)
+      }
+    }
+
+    if (data) {
+      try {
+        console.log(color,`${join(host,index)} : index data in index ${index} \n`)
+
+        let filePaths
+        let totalSize
+        let stats = statSync(data)
+
+        if (stats.isDirectory()) {
+          const { paths, size } = getAllFiles(data).reduce((accumulator, current) => { 
+            return {
+              paths: [...accumulator.paths, current.path],
+              size: accumulator.size + current.size
+            } 
+          }, { paths: [], size: 0 }) 
+
+          console.log("size found is : ")
+          console.log(size)
+
+          filePaths = paths
+          totalSize = FILE_SIZE_UNIT === "MB" ? Math.floor(size/1000000) : FILE_SIZE_UNIT === "KB" ? Math.floor(size/1000) : size
+          
+        } else if (stats.isFile()) {
+          filePaths = [data]
+          totalSize = FILE_SIZE_UNIT === "MB" ? Math.floor(stats.size/1000000) : FILE_SIZE_UNIT === "KB" ? Math.floor(stats.size/1000) : stats.size
+        }
+
+        let filePath
+        let processedSize = 0
+        let batch = []
+         
+        bar = new cliProgress.SingleBar({
+          format: `indexation [{bar}] {percentage}% | ELAPSED: {duration}s | ETA: {eta}s | {value}/{total} ${FILE_SIZE_UNIT}`
+        }, cliProgress.Presets.shades_classic);
+        bar.start(totalSize, processedSize)
+
+        while (filePath = filePaths.shift()) {
+          const rl = createInterface({
+            input: createReadStream(filePath),
+            crlfDelay: Infinity
+          })
+        
+          for await (const documentJSON of rl) {
+            if ( batch.length === BATCH_SIZE) {
+              response = await indexDocuments(host, index, batch)
+              updateSize = FILE_SIZE_UNIT === "MB" ? Math.floor(processedSize/1000000) : FILE_SIZE_UNIT === "KB" ? Math.floor(processedSize/1000) : processedSize
+              bar.update(updateSize)
+              batch = []
+            }
+
+            try {
+              const document = JSON.parse(documentJSON)
+              processedSize += Buffer.byteLength(documentJSON, "utf-8")
+              batch.push(document)
+            } catch(err) {
+              console.log(color,`${join(host,index)} : error parsing data document \n`)
+              console.log(color,`${documentJSON} \n`)
+              console.error(join(host,index) + ' : ' + err)
+            }
+          }
+        }
+
+        if ( batch.length > 0) {
+          response = await indexDocuments(host, index, batch)
+          updateSize = FILE_SIZE_UNIT === "MB" ? Math.floor(processedSize/1000000) : FILE_SIZE_UNIT === "KB" ? Math.floor(processedSize/1000) : processedSize
+          bar.update(updateSize)
+          batch = []
+        }
+
+        bar.stop()
+        console.log('\n')
+      } catch (err) {
+        console.log(color,`${join(host,index)} : error indexing data in index ${index} \n`)
+        console.error(join(host,index) + ' : ' + err)
+        throw new Error(join(host,index) + ' : ' + err)
       }
     }
 

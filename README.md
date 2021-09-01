@@ -28,6 +28,18 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 ### Setup using credentials
 ```elasticsetup -h 192.168.0.10-i products -c credentials.json -a analyzer.json mapping.json```
 
+### Setup with local data directory reindexing
+```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -m mapping.json -d ./data```
+
+### Setup with local data file reindexing
+```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -m mapping.json -d ./data/products.ndjson```
+
+### Setup with local data directory and data reindexing from other index
+```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -m mapping.json -d ./data -o products_old```
+
+### Setup using local data as index source
+```elasticsetup -h 192.168.0.10-i products -s settings.json -a analyzer.json -m mapping.json -d ./data```
+
 ### File format and examples 
 
 #### Credentials example
@@ -146,6 +158,8 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
   const host = ' 192.168.0.10'
   const index = 'products' 
   const otherIndex = 'oldProducts'
+  const dataDirPath = './data'
+  const dataDirPath = './data/products.json'
 
   // if authorization required
   const username = "user"
@@ -246,6 +260,15 @@ Lightweight library to quickly setup an Elasticsearch index from settings, analy
 
     // setup index with data reindexing from same index
     await setup(host, index, settings, analyzer, normalizer, tokenizer, mapping, index)
+
+    // setup index with data reindexing from local data file path
+    await setup(host, index, settings, analyzer, normalizer, tokenizer, mapping, null, dataFilePath)
+
+    // setup index with data reindexing from local data dir path
+    await setup(host, index, settings, analyzer, normalizer, tokenizer, mapping, null, dataDirPath)
+
+    // setup index with data reindexing from distinct index and local data path
+    await setup(host, index, settings, analyzer, normalizer, tokenizer, mapping, otherIndex, data)
   })()
 ```
 
@@ -264,6 +287,14 @@ The index to setup will be deleted ( if already existing ) and created with the 
 
 - Same origin index 
 A new temporary index will be firstly created and the original data will then be indexed into that temporary index. The original index will then be deleted and recreated with the settings and mapping provided. At the end of the process, the data stored into the temporary index will be indexed back into the newly created index and the temporary index will be ultimately deleted.
+
+- Local data file or directory
+Local data files are expected to be formatted as ndjson. Both file path and dir path can be passed as a data argument to the setup function. In case of dir path argument, all of the directory files will be parsed one by one and their records indexed.
+Local record indexation is performed through the use of the _bulk elasticsearch endpoint. Each batch is 1000 records big by default.
+
+Notes : 
+- Both reindexing from existing index and local data can be performed during the same index setup. If so, local data indexing will be done last ( potentially overwritting any previously indexed records having overlapping id )  
+- More on ndjson format at http://ndjson.org 
 
 # License
 

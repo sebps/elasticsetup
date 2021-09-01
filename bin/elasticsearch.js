@@ -1,5 +1,7 @@
 const fetch = require('node-fetch')
 
+const { writeFileSync } = require('fs') 
+
 const countIndex = async (host, index) => {
   let response = await fetch(`${host}/${index}/_count`, {
     method: 'get',
@@ -194,6 +196,39 @@ const updateMapping = async (host, index, mapping) => {
   }
 }
 
+const indexDocuments = async (host, index, documents) => {
+  
+  const body = documents.reduce((accumulator, doc, i, array) => {
+    return [
+      [
+        accumulator, 
+        [
+          JSON.stringify({ "index": { "_index" : index, "_id": doc._id || doc.id || undefined } }),
+          JSON.stringify(doc)
+        ].join('\n')
+      ].join('\n'),
+      ""
+    ].join(i === array.length - 1 ? '\n':'')
+  },'')
+
+  let response = await fetch(`${host}/_bulk`, {
+    method: 'post',
+    body,
+    headers: {
+      'Content-Type': 'application/x-ndjson',
+      'Authorization': process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN ? `Basic ${process.env.ELASTICSEARCH_AUTHORIZATION_TOKEN}` : undefined
+    }
+  })
+  
+  let json = await response.json()
+
+  if (!response.ok) {
+    throw new Error(json.error.reason ? json.error.reason : json.error ? json.error : "error")
+  } else {
+    return json
+  }
+}
+
 module.exports = {
   closeIndex,
   countIndex,
@@ -205,4 +240,5 @@ module.exports = {
   reIndex,
   updateSettings,
   updateMapping,
+  indexDocuments
 }
